@@ -58,7 +58,7 @@ module tool_box(
 //=======================================================
 //  REG/WIRE declarations
 //=======================================================
-reg [15:0] bits = 16'b1010_1011_1100_1101;
+wire [15:0] bits;
 wire one_second_clock;
 wire five_hertz_clk;
 
@@ -98,16 +98,13 @@ LEVEL_CAMP  cmp(
 );
  
 
-//LED DISPLAY
-assign LED [7:0]  = 8'hff ^  distance ; 
-
-
-
 
 
 
 seg7 module1(five_hertz_clk, bits, GPIO0_D[11:0]);
 half_second_clock module2(MAX10_CLK1_50, one_second_clock);
 clk_500hz module3(MAX10_CLK1_50, five_hertz_clk);
+
+assign bits = distance;
 
 endmodule
