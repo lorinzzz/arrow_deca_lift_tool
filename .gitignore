@@ -36,3 +36,4 @@ incremental_db/README
 *.jdi
 *.pin
 *.pof
+*.tdf

@@ -58,18 +58,56 @@ module tool_box(
 //=======================================================
 //  REG/WIRE declarations
 //=======================================================
-reg [15:0] bits = 16'b1001_1001_1001_1001;
+reg [15:0] bits = 16'b1010_1011_1100_1101;
 wire one_second_clock;
-wire hundred_hertz_clk;
+wire five_hertz_clk;
+
+// for light sensor
+wire [7:0] distance ; 
+wire [15:0]DAT ; 
+wire [15:0]PS1_DATA;
+wire [15:0]PS2_DATA;
+wire [15:0]PS3_DATA;
+wire [17:0]PS_DATA;
+wire       RESET_N ; 
 //=======================================================
 //  Structural coding
 //=======================================================
-assign LED[7:0] = 8'b11111111;
+
+
+assign RESET_N = KEY[0] ;
+
+//---Light_Sensor Controller--  
+LSEN_CTRL  lsen( 
+   .RESET_N      (RESET_N) , 
+   .CLK_50       (MAX10_CLK1_50),
+	.LIGHT_I2C_SCL(LIGHT_I2C_SCL),
+	.LIGHT_I2C_SDA(LIGHT_I2C_SDA),
+	.LIGHT_INT    (LIGHT_INT),	
+	.PS1_DATA     (PS1_DATA),		
+	.PS2_DATA     (PS2_DATA),		
+	.PS3_DATA     (PS3_DATA)	
+	);
+
+assign PS_DATA	= (PS1_DATA+PS2_DATA+PS3_DATA)/3  ; 
+
+//--LEVEL Processor---
+LEVEL_CAMP  cmp(
+ .PS_DATA (PS_DATA) ,
+ .LEVEL   (distance)
+);
+ 
+
+//LED DISPLAY
+assign LED [7:0]  = 8'hff ^  distance ; 
 
 
 
-seg7 module1(hundred_hertz_clk, bits, GPIO0_D[7:0]);
+
+
+
+seg7 module1(five_hertz_clk, bits, GPIO0_D[11:0]);
 half_second_clock module2(MAX10_CLK1_50, one_second_clock);
-clk_500hz module3(MAX10_CLK1_50, hundred_hertz_clk);
+clk_500hz module3(MAX10_CLK1_50, five_hertz_clk);
 
 endmodule
