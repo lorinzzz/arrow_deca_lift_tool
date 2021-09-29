@@ -39,7 +39,7 @@ module generateClocks(
 		begin
 			moderate_counter <= moderate_counter + 1'b1;
 		end
-		if(fast_counter == 27'd1_250_000)
+		if(fast_counter == 27'd6_250_000)
 		begin
 			fast_counter <= 0;
 			fast_clk <= ~fast_clk;

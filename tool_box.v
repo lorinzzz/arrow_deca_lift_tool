@@ -58,7 +58,6 @@ module tool_box(
 //=======================================================
 //  REG/WIRE declarations
 //=======================================================
-wire [15:0] bits;
 wire five_hundred_hertz_clk;
 wire [11:0] hex_displays;
 wire alarm;
@@ -70,13 +69,35 @@ wire moderate_clk;
 wire fast_clk;
 
 // for light sensor
-wire [7:0] distance ; 
+wire [7:0] light_sensor_data; 
 wire [15:0]DAT ; 
 wire [15:0]PS1_DATA;
 wire [15:0]PS2_DATA;
 wire [15:0]PS3_DATA;
 wire [17:0]PS_DATA;
 wire       RESET_N ; 
+
+
+
+
+// g sensor
+wire [15:0]   OUT_X ; 
+wire [15:0]   OUT_Y ; 
+wire [15:0]   OUT_Z ; 
+wire [7:0]    WHO_AM_I ;
+wire  [16:0]  s_data_x  ;  
+wire  [16:0]  data_x ;
+wire  [16:0]  s_data_y  ;  
+wire  [16:0]  data_y ;
+wire  [7:0]   gsensor_x ;
+wire  [7:0]   gsensor_y ;
+wire  [7:0]   gsensor_data ;
+wire          reset_n ; 
+wire          DATA_RDY ; 
+
+
+// for display_alarm mux
+wire [7:0] selected_data;
 //=======================================================
 //  Structural coding
 //=======================================================
@@ -101,16 +122,68 @@ assign PS_DATA	= (PS1_DATA+PS2_DATA+PS3_DATA)/3  ;
 //--LEVEL Processor---
 LEVEL_CAMP  cmp(
  .PS_DATA (PS_DATA) ,
- .LEVEL   (distance)
+ .LEVEL   (light_sensor_data)
 );
  
  
-seg7 module1(five_hundred_hertz_clk, bits, hex_displays);
+seg7 module1(five_hundred_hertz_clk, selected_data, hex_displays);
 generateClocks module2(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk);
 clk_500hz module3(MAX10_CLK1_50, five_hundred_hertz_clk);
-active_buzzer module4(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk, distance, alarm);
+active_buzzer module4(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk, selected_data, alarm);
+display_alarm_multiplexer module5(light_sensor_data, gsensor_data, SW[0], selected_data);
+x_y_gsensor_multiplexer module6(gsensor_x, gsensor_y, SW[1], gsensor_data);
 
-assign bits = distance;
+
 assign GPIO0_D[11:0] = hex_displays;
 assign GPIO0_D[12] = alarm;
+
+
+
+// g sensor
+assign LED[7:0] = 8'hff ^ {gsensor_data[0],gsensor_data[1],gsensor_data[2],gsensor_data[3],gsensor_data[4],gsensor_data[5],gsensor_data[6],gsensor_data[7] }  ;
+
+//---- reset  --- 
+assign  reset_n = KEY[0]; 
+
+//---G-Sensor for SPI Controller ----  
+SPI_CTL spi(
+ .DATA_RDY (DATA_RDY),
+ .RESET_N  (reset_n ), 
+ .CLK_50   (MAX10_CLK1_50), 
+ .OUT_X    (OUT_X   ) ,
+ .OUT_Y    (OUT_Y   ) ,
+ .OUT_Z    (OUT_Z   ) ,
+ .WHO_AM_I (WHO_AM_I) ,
+ .CS     (G_SENSOR_CS_n),
+ .SCLK   (G_SENSOR_SCLK ) ,
+ .DIN    (G_SENSOR_SDI),
+ .DO     (G_SENSOR_SDO)
+ );  
+
+//OUT_X : two’s complement left-justified.
+//s_data_x :Shift OUT_X to positive number
+assign s_data_x      = 32768  +   OUT_X ;
+assign data_x [11:0] = s_data_x[15:4] ; 
+
+//-----LED Processor----
+led_driver get_x_gsensor_data	(
+    .iRSTN    ( reset_n),
+    .iCLK     ( MAX10_CLK1_50 ),
+    .iDIG     ( data_x[10:1]),
+    .iG_INT2  ( DATA_RDY ) ,
+    .oLED     ( gsensor_x),
+    .fine_tune( ~KEY[0] )  );
+
+
+assign s_data_y      = 32768  +   OUT_Y ;
+assign data_y [11:0] = s_data_y[15:4] ; 
+
+//-----LED Processor----
+led_driver get_y_gsensor_data	(
+    .iRSTN    ( reset_n),
+    .iCLK     ( MAX10_CLK1_50 ),
+    .iDIG     ( data_y[10:1]),
+    .iG_INT2  ( DATA_RDY ) ,
+    .oLED     ( gsensor_y),
+    .fine_tune( ~KEY[0] )  );
 endmodule

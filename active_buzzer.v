@@ -9,10 +9,7 @@ module active_buzzer(
 	
 	
 	// 4 different clocks to implement 4 different rate of beeping
-	
-	
-	
-	
+
 	// sound off when a certain value exceeds threshhold
 	
 	always@(clk)
@@ -30,13 +27,14 @@ module active_buzzer(
 		begin	
 			alarm <= ~alarm;
 		end	
-		else if(distance == 8'd2 && fast_clk == 1'b1) // fast  beep
+		else if(distance <= 8'd2 && fast_clk == 1'b1) // fast  beep
 		begin	
 			alarm <= ~alarm;
 		end	
-		else if(distance == 8'd1 || distance == 8'd0)  // flat tone
-		begin	
-			alarm <= ~alarm;
+		
+		else
+		begin
+			alarm <= 1'b0;
 		end
 		
 	end
