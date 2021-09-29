@@ -1,23 +1,54 @@
-module half_second_clock(
+module generateClocks(
 	input clk,
-	output reg slow_clk);
+	output reg slower_clk, // 2 beeps/sec => divide by 25 million cycles 
+	output reg slow_clk, // 3 beeps/sec => "           " 16.66 "    "
+	output reg moderate_clk, // 4 beeps/sec => "        " 12.5 "     "
+	output reg fast_clk); // 8 beeps/sec   "           " 6.25 "    "
 	
-	// for half second, take one high clock cycle every 25 million cycles
-	
-	reg[26:0] counter; 
-	reg edge_det; 
+	reg[26:0] slower_counter; 
+	reg[26:0] slow_counter; 
+	reg[26:0] moderate_counter; 
+	reg[26:0] fast_counter; 
 	
 	always@(posedge clk) 
 	begin
-		if(counter == 27'd25_000_000 )
+		if(slower_counter == 27'd25_000_000)
 		begin
-			counter <= 0;
+			slower_counter <= 0;
+			slower_clk <= ~slower_clk;
+		end
+		else
+		begin
+			slower_counter <= slower_counter + 1'b1;
+		end
+		if(slow_counter == 27'd16_666_666)
+		begin
+			slow_counter <= 0;
 			slow_clk <= ~slow_clk;
 		end
 		else
 		begin
-			counter <= counter + 1'b1;
+			slow_counter <= slow_counter + 1'b1;
 		end
+		if(moderate_counter == 27'd12_500_000)
+		begin
+			moderate_counter <= 0;
+			moderate_clk <= ~moderate_clk;
+		end
+		else
+		begin
+			moderate_counter <= moderate_counter + 1'b1;
+		end
+		if(fast_counter == 27'd1_250_000)
+		begin
+			fast_counter <= 0;
+			fast_clk <= ~fast_clk;
+		end
+		else
+		begin
+			fast_counter <= fast_counter + 1'b1;
+		end
+
 	end
 	
 endmodule

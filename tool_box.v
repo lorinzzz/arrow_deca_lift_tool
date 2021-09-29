@@ -59,8 +59,15 @@ module tool_box(
 //  REG/WIRE declarations
 //=======================================================
 wire [15:0] bits;
-wire one_second_clock;
-wire five_hertz_clk;
+wire five_hundred_hertz_clk;
+wire [11:0] hex_displays;
+wire alarm;
+
+// clks for each threshold alarm
+wire slower_clk;
+wire slow_clk;
+wire moderate_clk;
+wire fast_clk;
 
 // for light sensor
 wire [7:0] distance ; 
@@ -97,14 +104,13 @@ LEVEL_CAMP  cmp(
  .LEVEL   (distance)
 );
  
-
-
-
-
-seg7 module1(five_hertz_clk, bits, GPIO0_D[11:0]);
-half_second_clock module2(MAX10_CLK1_50, one_second_clock);
-clk_500hz module3(MAX10_CLK1_50, five_hertz_clk);
+ 
+seg7 module1(five_hundred_hertz_clk, bits, hex_displays);
+generateClocks module2(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk);
+clk_500hz module3(MAX10_CLK1_50, five_hundred_hertz_clk);
+active_buzzer module4(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk, distance, alarm);
 
 assign bits = distance;
-
+assign GPIO0_D[11:0] = hex_displays;
+assign GPIO0_D[12] = alarm;
 endmodule

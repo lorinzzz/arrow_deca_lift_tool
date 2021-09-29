@@ -5,7 +5,6 @@ module clk_500hz(
 	// 500Hz clock
 	
 	reg[26:0] counter; 
-	reg edge_det; 
 	
 	always@(posedge clk) 
 	begin
