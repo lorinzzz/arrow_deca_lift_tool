@@ -27,7 +27,7 @@ begin
 		case(curr_display)
 			2'b00: digit_on <= 12'b0000_0010_0000; // D4
 			2'b01: digit_on <= 12'b0000_1000_0000; // D3
-			2'b10: digit_on <= 12'b0001_0000_0000; // D2
+			2'b10: digit_on <= 12'b0001_0000_0100; // D2, also turns on the decimal point
 			2'b11: digit_on <= 12'b1000_0000_0000; // D1
 		endcase	
 		
@@ -49,12 +49,15 @@ begin
 			4'b0111: HEX <= 12'b1101_1110_1000 ^ digit_on; // 7
 			4'b1000: HEX <= 12'b1111_1111_1011 ^ digit_on; // 8
 			4'b1001: HEX <= 12'b1111_1111_1010 ^ digit_on; // 9
-			4'b1010: HEX <= 12'b1111_1111_1001 ^ digit_on; // 10 A
-			4'b1011: HEX <= 12'b1011_1011_1011 ^ digit_on; // 11 B
-			4'b1100: HEX <= 12'b1111_1010_0011 ^ digit_on; // 12 C
-			4'b1101: HEX <= 12'b1001_1111_1011 ^ digit_on; // 13 D
-			4'b1110: HEX <= 12'b1111_1011_0011 ^ digit_on; // 14 E
-			4'b1111: HEX <= 12'b1111_1011_0001 ^ digit_on; // 15 F
+			
+			4'b1010: HEX <= 12'b1001_1010_0000; // turn off hex or used to represent "+" pos value
+			4'b1011: HEX <= 12'b1001_1011_0000 ^ digit_on; // -
+			//4'b1010: HEX <= 12'b1111_1111_1001 ^ digit_on; // 10 A
+			//4'b1011: HEX <= 12'b1011_1011_1011 ^ digit_on; // 11 B
+			//4'b1100: HEX <= 12'b1111_1010_0011 ^ digit_on; // 12 C
+			//4'b1101: HEX <= 12'b1001_1111_1011 ^ digit_on; // 13 D
+			//4'b1110: HEX <= 12'b1111_1011_0011 ^ digit_on; // 14 E
+			//4'b1111: HEX <= 12'b1111_1011_0001 ^ digit_on; // 15 F
 		endcase
 	
 		if(curr_display == 2'b11)

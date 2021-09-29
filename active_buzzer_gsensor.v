@@ -1,10 +1,10 @@
-module active_buzzer_light_sensor(
+module active_buzzer_gsensor(
 	input clk,
 	input slower_clk, 
 	input slow_clk, 
 	input moderate_clk, 
 	input fast_clk,
-	input [7:0] distance,
+	input [15:0] gsensor_values, // [15:8] are X values, [7:0] are Y values
 	output reg alarm);	
 	
 	

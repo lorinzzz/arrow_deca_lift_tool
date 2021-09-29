@@ -91,13 +91,14 @@ wire  [16:0]  s_data_y  ;
 wire  [16:0]  data_y ;
 wire  [7:0]   gsensor_x ;
 wire  [7:0]   gsensor_y ;
-wire  [7:0]   gsensor_data ;
+wire  [7:0] 	gsensor_led_data;
+wire  [15:0]   gsensor_hex_data ;
 wire          reset_n ; 
 wire          DATA_RDY ; 
 
 
 // for display_alarm mux
-wire [7:0] selected_data;
+wire [15:0] selected_data;
 //=======================================================
 //  Structural coding
 //=======================================================
@@ -126,21 +127,23 @@ LEVEL_CAMP  cmp(
 );
  
  
+ //reg [15:0] test = 16'b0001_1000_1011_0101;
 seg7 module1(five_hundred_hertz_clk, selected_data, hex_displays);
 generateClocks module2(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk);
 clk_500hz module3(MAX10_CLK1_50, five_hundred_hertz_clk);
-active_buzzer module4(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk, selected_data, alarm);
-display_alarm_multiplexer module5(light_sensor_data, gsensor_data, SW[0], selected_data);
-x_y_gsensor_multiplexer module6(gsensor_x, gsensor_y, SW[1], gsensor_data);
+active_buzzer_light_sensor module4(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk, selected_data, alarm);
+display_alarm_multiplexer module5(light_sensor_data, gsensor_hex_data, SW[0], selected_data);
+x_y_gsensor_multiplexer module6(gsensor_x, gsensor_y, SW[1], gsensor_led_data);
+gsensor_led_to_hex module7(MAX10_CLK1_50, gsensor_x, gsensor_y, gsensor_hex_data);
 
 
 assign GPIO0_D[11:0] = hex_displays;
 assign GPIO0_D[12] = alarm;
-
+assign GPIO0_D[13] = 1'b1;
 
 
 // g sensor
-assign LED[7:0] = 8'hff ^ {gsensor_data[0],gsensor_data[1],gsensor_data[2],gsensor_data[3],gsensor_data[4],gsensor_data[5],gsensor_data[6],gsensor_data[7] }  ;
+assign LED[7:0] = 8'hff ^ {gsensor_led_data[0],gsensor_led_data[1],gsensor_led_data[2],gsensor_led_data[3],gsensor_led_data[4],gsensor_led_data[5],gsensor_led_data[6],gsensor_led_data[7] }  ;
 
 //---- reset  --- 
 assign  reset_n = KEY[0]; 

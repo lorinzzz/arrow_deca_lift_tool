@@ -39,7 +39,7 @@ module generateClocks(
 		begin
 			moderate_counter <= moderate_counter + 1'b1;
 		end
-		if(fast_counter == 27'd6_250_000)
+		if(fast_counter == 27'd5_000_000) // made it just a bit faster => 10 beeps a sec
 		begin
 			fast_counter <= 0;
 			fast_clk <= ~fast_clk;
