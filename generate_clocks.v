@@ -1,4 +1,4 @@
-module generateClocks(
+module generate_clocks(
 	input clk,
 	output reg slower_clk, // 2 beeps/sec => divide by 25 million cycles 
 	output reg slow_clk, // 3 beeps/sec => "           " 16.66 "    "

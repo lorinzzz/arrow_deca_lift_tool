@@ -73,7 +73,7 @@ module gsensor_led_to_hex(
 		
 	end
 
-	// assign gsensor_hex_data = {gsensor_hex_x_data, gsensor_hex_y_data}
+
 assign gsensor_hex_data = {gsensor_hex_x_data, gsensor_hex_y_data};
 
 endmodule

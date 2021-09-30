@@ -274,6 +274,8 @@ set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name VERILOG_FILE clk_500hz.v
+set_global_assignment -name VERILOG_FILE generate_clocks.v
 set_global_assignment -name VERILOG_FILE TP.v
 set_global_assignment -name VERILOG_FILE SPI_CTL.v
 set_global_assignment -name VERILOG_FILE led_driver.v
@@ -283,8 +285,6 @@ set_global_assignment -name VERILOG_FILE LEVEL_CAMP.v
 set_global_assignment -name VERILOG_FILE I2C_WRITE_POINTER.v
 set_global_assignment -name VERILOG_FILE I2C_WRITE_BYTE.v
 set_global_assignment -name VERILOG_FILE I2C_READ_BYTE.v
-set_global_assignment -name VERILOG_FILE half_second_clk.v
-set_global_assignment -name SYSTEMVERILOG_FILE 500Hz_clk.sv
 set_global_assignment -name VERILOG_FILE seg7.v
 set_global_assignment -name SDC_FILE tool_box.SDC
 set_global_assignment -name VERILOG_FILE active_buzzer.v

@@ -52,12 +52,6 @@ begin
 			
 			4'b1010: HEX <= 12'b1001_1010_0000; // turn off hex or used to represent "+" pos value
 			4'b1011: HEX <= 12'b1001_1011_0000 ^ digit_on; // -
-			//4'b1010: HEX <= 12'b1111_1111_1001 ^ digit_on; // 10 A
-			//4'b1011: HEX <= 12'b1011_1011_1011 ^ digit_on; // 11 B
-			//4'b1100: HEX <= 12'b1111_1010_0011 ^ digit_on; // 12 C
-			//4'b1101: HEX <= 12'b1001_1111_1011 ^ digit_on; // 13 D
-			//4'b1110: HEX <= 12'b1111_1011_0011 ^ digit_on; // 14 E
-			//4'b1111: HEX <= 12'b1111_1011_0001 ^ digit_on; // 15 F
 		endcase
 	
 		if(curr_display == 2'b11)
@@ -66,7 +60,7 @@ begin
 		end
 		else
 		begin
-		curr_display = curr_display + 1'b1;
+			curr_display = curr_display + 1'b1;
 		end
 
 end
