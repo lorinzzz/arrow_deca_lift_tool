@@ -16,10 +16,6 @@ module tool_box(
 	//////////// LED //////////
 	output		     [7:0]		LED,
 
-	//////////// CapSense Button //////////
-	inout 		          		CAP_SENSE_I2C_SCL,
-	inout 		          		CAP_SENSE_I2C_SDA,
-
 	//////////// G-Sensor //////////
 	output		          		G_SENSOR_CS_n,
 	input 		          		G_SENSOR_INT1,
@@ -33,18 +29,8 @@ module tool_box(
 	inout 		          		LIGHT_I2C_SDA,
 	inout 		          		LIGHT_INT,
 
-	//////////// Humidity and Temperature Sensor //////////
-	input 		          		RH_TEMP_DRDY_n,
-	output		          		RH_TEMP_I2C_SCL,
-	inout 		          		RH_TEMP_I2C_SDA,
-
 	//////////// SW //////////
 	input 		     [1:0]		SW,
-
-	//////////// Board Temperature Sensor //////////
-	output		          		TEMP_CS_n,
-	output		          		TEMP_SC,
-	inout 		          		TEMP_SIO,
 
 	//////////// BBB Conector //////////
 	input 		          		BBB_PWR_BUT,
@@ -77,9 +63,6 @@ wire [15:0]PS3_DATA;
 wire [17:0]PS_DATA;
 wire       RESET_N ; 
 
-
-
-
 // g sensor
 wire [15:0]   OUT_X ; 
 wire [15:0]   OUT_Y ; 
@@ -99,6 +82,7 @@ wire          DATA_RDY ;
 
 // for display_alarm mux
 wire [15:0] selected_data;
+wire buzzer_mode;
 //=======================================================
 //  Structural coding
 //=======================================================
@@ -119,7 +103,11 @@ LSEN_CTRL  lsen(
 	);
 
 assign PS_DATA	= (PS1_DATA+PS2_DATA+PS3_DATA)/3  ; 
-
+assign GPIO0_D[11:0] = hex_displays;
+assign GPIO0_D[12] = alarm;
+assign LED[7:0] = 8'hff ^ {gsensor_led_data[0],gsensor_led_data[1],gsensor_led_data[2],gsensor_led_data[3]
+									,gsensor_led_data[4],gsensor_led_data[5],gsensor_led_data[6],gsensor_led_data[7] };
+assign  reset_n = KEY[0]; 									
 //--LEVEL Processor---
 LEVEL_CAMP  cmp(
  .PS_DATA (PS_DATA) ,
@@ -127,23 +115,15 @@ LEVEL_CAMP  cmp(
 );
  
  
- //reg [15:0] test = 16'b0001_1000_1011_0101;
 seg7 module1(five_hundred_hertz_clk, selected_data, hex_displays);
 generateClocks module2(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk);
 clk_500hz module3(MAX10_CLK1_50, five_hundred_hertz_clk);
-active_buzzer_light_sensor module4(MAX10_CLK1_50, slower_clk, slow_clk, moderate_clk, fast_clk, selected_data, alarm);
-display_alarm_multiplexer module5(light_sensor_data, gsensor_hex_data, SW[0], selected_data);
+active_buzzer module4(MAX10_CLK1_50, buzzer_mode, slower_clk, slow_clk, moderate_clk, fast_clk, selected_data, alarm);
+display_alarm_multiplexer module5(light_sensor_data, gsensor_hex_data, SW[0], selected_data, buzzer_mode);
 x_y_gsensor_multiplexer module6(gsensor_x, gsensor_y, SW[1], gsensor_led_data);
 gsensor_led_to_hex module7(MAX10_CLK1_50, gsensor_x, gsensor_y, gsensor_hex_data);
 
 
-assign GPIO0_D[11:0] = hex_displays;
-assign GPIO0_D[12] = alarm;
-assign GPIO0_D[13] = 1'b1;
-
-
-// g sensor
-assign LED[7:0] = 8'hff ^ {gsensor_led_data[0],gsensor_led_data[1],gsensor_led_data[2],gsensor_led_data[3],gsensor_led_data[4],gsensor_led_data[5],gsensor_led_data[6],gsensor_led_data[7] }  ;
 
 //---- reset  --- 
 assign  reset_n = KEY[0]; 
